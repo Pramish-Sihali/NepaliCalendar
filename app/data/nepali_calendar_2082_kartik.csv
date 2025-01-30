@@ -1,0 +1,36 @@
+nepali_date,english_date,tithi,festival,holiday,marriage_date,bratabandha,day_of_week
+,,,,False,False,False,0
+,,,,False,False,False,1
+,,,,False,False,False,2
+,,,,False,False,False,3
+,,,,False,False,False,4
+1,17,Ekadashi,Rama Ekadashi,True,False,False,5
+2,18,Dwadashi,Yama Panchak Aarambha,True,False,False,6
+3,19,Trayodashi,Kaag Tihar,True,False,False,0
+4,20,Chaturdashi,Kukur Tihar,True,False,False,1
+5,21,Aaunshi,"Deepawali, Laxmi Puja",True,False,False,2
+6,22,Pratipada,"Gobardhan Puja, Mha Puja",True,False,False,3
+7,23,Ditiya,Bhai Tika,True,False,False,4
+8,24,Tritiya,,False,False,False,5
+9,25,Chaturthi,,False,False,False,6
+10,26,Panchami,,False,False,False,0
+11,27,Panchami,,False,False,False,1
+12,28,Sasthi,Chhath Parba,True,False,False,2
+13,29,Saptami,,False,False,False,3
+14,30,Aastami,,False,False,False,4
+15,31,Nawami,,False,False,False,5
+16,01,Dashami,Haribodhini Ekadashi,True,False,False,6
+17,02,Ekadashi,Tulashi Bibah,True,False,False,0
+18,03,Trayodashi,,False,False,False,1
+19,04,Chaturdashi,,False,False,False,2
+20,05,Purnima,,False,False,False,3
+21,06,Pratipada,,False,False,False,4
+22,07,Ditiya,,False,False,False,5
+23,08,Tritiya,,False,False,False,6
+24,09,Panchami,,False,False,False,0
+25,10,Sasthi,Falgunanda Jayanti  (Holiday for Kiranti People),True,False,False,1
+26,11,Saptami,,False,False,False,2
+27,12,Aastami,,False,False,False,3
+28,13,Nawami,,False,False,False,4
+29,14,Dashami,,False,False,False,5
+30,15,Ekadashi,Utpatika Ekadashi,True,False,False,6

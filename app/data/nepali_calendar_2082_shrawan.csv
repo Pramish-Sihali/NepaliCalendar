@@ -1,0 +1,36 @@
+nepali_date,english_date,tithi,festival,holiday,marriage_date,bratabandha,day_of_week
+,,,,False,False,False,0
+,,,,False,False,False,1
+,,,,False,False,False,2
+,,,,False,False,False,3
+1,17,Saptami,"Saune Sankranti, Luto Falne Ebam Ranko balne",True,False,False,4
+2,18,Aastami,,False,False,False,5
+3,19,Nawami,,False,False,False,6
+4,20,Dashami,,False,False,False,0
+5,21,Ekadashi,Kamika Ekadashi,True,False,False,1
+6,22,Dwadashi,,False,False,False,2
+7,23,Trayodashi,,False,False,False,3
+8,24,Aaunshi,,False,False,False,4
+9,25,Pratipada,,False,False,False,5
+10,26,Ditiya,,False,False,False,6
+11,27,Tritiya,,False,False,False,0
+12,28,Chaturthi,,False,False,False,1
+13,29,Panchami,Naag Panchami,True,False,False,2
+14,30,Sasthi,,False,False,False,3
+15,31,Saptami,Khir Khane Din,True,False,False,4
+16,01,Aastami,,False,False,False,5
+17,02,Aastami,,False,False,False,6
+18,03,Nawami,,False,False,False,0
+19,04,Dashami,,False,False,False,1
+20,05,Ekadashi,Putrada Ekadashi,True,False,False,2
+21,06,Dwadashi,,False,False,False,3
+22,07,Trayodashi,,False,False,False,4
+23,08,Chaturdashi,,False,False,False,5
+24,09,Purnima,"Janai Purnima, Rishi Tarpani",True,False,False,6
+25,10,Pratipada,,False,False,False,0
+26,11,Ditiya,,False,False,False,1
+27,12,Tritiya,,False,False,False,2
+28,13,Chaturthi,,False,False,False,3
+29,14,Sasthi,,False,False,False,4
+30,15,Saptami,"Shree Krishna Janmastami, Gaura Parba",True,False,False,5
+31,16,Aastami,,False,False,False,6

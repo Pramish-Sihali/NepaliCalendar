@@ -1,0 +1,36 @@
+nepali_date,english_date,tithi,festival,holiday,marriage_date,bratabandha,day_of_week
+,,,,False,False,False,0
+,,,,False,False,False,1
+1,14,Sasthi,,False,False,False,2
+2,15,Saptami,,False,False,False,3
+3,16,Aastami,"Aastami Brat, Gorakhkali Puja",True,False,False,4
+4,17,Nawami,,False,False,False,5
+5,18,Dashami,,False,False,False,6
+6,19,Ekadashi,Mohini Ekadashi Brat,True,False,False,0
+7,20,Dwadashi,,False,False,False,1
+8,21,Trayodashi,Narsinha Jayanti,True,False,False,2
+9,22,Chaturdashi,Syangja Lasargha Aalamdevi Puja,True,False,False,3
+10,23,Purnima,"Chandi Purnima, Gautam Buddha Jayanti",True,False,False,4
+11,24,Pratipada,,False,False,False,5
+12,25,Ditiya,,False,False,False,6
+13,26,Tritiya,,False,False,False,0
+14,27,Chaturthi,,False,False,False,1
+15,28,Panchami,Ganatantra Diwas,True,False,False,2
+16,29,Sasthi,,False,False,False,3
+17,30,Saptami,"Aastami Brat, Gorakhkali Puja",True,False,False,4
+18,31,Aastami,,False,False,False,5
+19,01,Nawami,,False,False,False,6
+20,02,Ekadashi,Smartaharuko Apara Ekadashi Brat,True,False,False,0
+21,03,Dwadashi,"Baishnab haruko Apara Ekadashi Brat, Jatiya Bhedbhaw tatha Chuwachut Unmulan Rastriya Diwas",True,False,False,1
+22,04,Trayodashi,,False,False,False,2
+23,05,Chaturdashi,Sithicha:hre,True,False,False,3
+24,06,Aaunshi,"Darsha Shradda, Shani Jayanti",True,False,False,4
+25,07,Pratipada,Gosaikunda Snan Aarambha,True,False,False,5
+26,08,Ditiya,,False,False,False,6
+27,09,Tritiya,,False,False,False,0
+28,10,Chaturthi,,False,False,False,1
+29,11,Panchami,,False,False,False,2
+30,12,Sasthi,"Kumar Shasthi, Sithi:Nakha:",True,False,False,3
+31,13,Saptami,Kumar Yatra,True,False,False,4
+32,14,Aastami,"Bayu Astami, Gorakhkali Puja",True,False,False,5
+,,,,False,False,False,6

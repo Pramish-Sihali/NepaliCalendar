@@ -1,0 +1,36 @@
+nepali_date,english_date,tithi,festival,holiday,marriage_date,bratabandha,day_of_week
+,,,,False,False,False,0
+,,,,False,False,False,1
+1,16,Dashami,"Saune Sankranti, Luto Falne",True,False,False,2
+2,17,Ekadashi,"Harisayani Ekadashi, Tulashi Ropne",True,False,False,3
+3,18,Dwadashi,,False,False,False,4
+4,19,Trayodashi,,False,False,False,5
+5,20,Chaturdashi,Purnima Brat,True,False,False,6
+6,21,Purnima,"Guru Purnima, Byas Jayanti",True,False,False,0
+7,22,Pratipada,,False,False,False,1
+8,23,Ditiya,,False,False,False,2
+9,24,Tritiya,,False,False,False,3
+10,25,Chaturthi,,False,False,False,4
+11,26,Panchami,,False,False,False,5
+12,27,Saptami,,False,False,False,6
+13,28,Aastami,Gorakhkali Puja,True,False,False,0
+14,29,Nawami,,False,False,False,1
+15,30,Dashami,Khir Khane Din,True,False,False,2
+16,31,Ekadashi,Kamika Ekadashi Brat,True,False,False,3
+17,01,Dwadashi,,False,False,False,4
+18,02,Trayodashi,"Ghantakarna Chaturdashi, Gathanmugcharhe",True,False,False,5
+19,03,Chaturdashi,Nishi Barne,True,False,False,6
+20,04,Aaunshi,,False,False,False,0
+21,05,Pratipada,"Gunladharma Aarambha, Chandrodaya",True,False,False,1
+22,06,Ditiya,,False,False,False,2
+23,07,Tritiya,Baraha Jayanti,True,False,False,3
+24,08,Chaturthi,,False,False,False,4
+25,09,Panchami,Naag Panchami (Naag Tasne),True,False,False,5
+26,10,Sasthi,,False,False,False,6
+27,11,Saptami,Rabi Saptami,True,False,False,0
+28,12,Aastami,"International Youths Day, Gorakhkali Puja",True,False,False,1
+29,13,Nawami,,False,False,False,2
+30,14,Nawami,,False,False,False,3
+31,15,Dashami,,False,False,False,4
+32,16,Ekadashi,Putrada Ekadashi Brat,True,False,False,5
+,,,,False,False,False,6

@@ -3,8 +3,8 @@
 
 import { useState } from 'react';
 import Calendar from './components/calendar';
-import { EventList } from './components/EventList';
-import { CalendarEvent, NepaliDate } from './components/types';
+import { EventsSection } from './components/EventsSection';
+import { CalendarEvent } from './components/types';
 
 export default function Home() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -17,24 +17,39 @@ export default function Home() {
     setEvents((prev) => [...prev, newEvent]);
   };
 
+  const handleEditEvent = (updatedEvent: CalendarEvent) => {
+    setEvents((prev) => 
+      prev.map((event) => 
+        event.id === updatedEvent.id ? updatedEvent : event
+      )
+    );
+  };
+
+  const handleDeleteEvent = (eventId: string) => {
+    setEvents((prev) => prev.filter((event) => event.id !== eventId));
+  };
+
   return (
     <main className="min-h-screen p-8 bg-gray-50">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <h1 className="text-3xl font-bold text-gray-900 text-center">
           नेपाली पात्रो
         </h1>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            {/* <Calendar events={events} onEventAdd={handleAddEvent} /> */}
-            <Calendar 
-  events={events} 
-  onEventAdd={handleAddEvent} 
-/>
+        
+        <div className="grid grid-cols-12 gap-8">
+          <div className="col-span-12 lg:col-span-8">
+            <div className="sticky top-8">
+              <Calendar events={events} onEventAdd={handleAddEvent} />
+            </div>
           </div>
-          <div>
-            <div className="bg-white p-4 rounded border-2 border-dashed border-red-500">
-            <EventList events={events} />
-              </div>
+          <div className="col-span-12 lg:col-span-4">
+            <div className="sticky top-8">
+              <EventsSection 
+                events={events}
+                onEventEdit={handleEditEvent}
+                onEventDelete={handleDeleteEvent}
+              />
+            </div>
           </div>
         </div>
       </div>

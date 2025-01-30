@@ -1,7 +1,7 @@
 // components/calendar/Calendar.tsx
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { CalendarHeader } from './calendarHeader';
+import { CalendarHeader } from './CalendarHeader';
 import { DayCell } from './DayCell';
 import { findCurrentNepaliDate } from './utils';
 import type { CalendarProps, CalendarData, MonthInfo, NepaliDate } from './types';

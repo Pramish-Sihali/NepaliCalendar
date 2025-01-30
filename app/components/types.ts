@@ -11,6 +11,7 @@ export interface EnglishDate {
   day: number;
 }
 
+// types.ts
 export interface CalendarData {
   nepali_date: string;
   english_date: string;
@@ -20,6 +21,7 @@ export interface CalendarData {
   marriage_date: boolean;
   bratabandha: boolean;
   day_of_week: number;
+  isOutsideMonth?: boolean;
 }
 
 export interface MonthInfo {
@@ -54,10 +56,13 @@ export interface CalendarProps {
 }
 
 export interface CalendarEvent {
+  description: string;
   id: string;
   title: string;
   date: NepaliDate;
   time?: string;
+  startTime?: string;
+  endTime?: string;
   isAllDay: boolean;
   color: string;
 }

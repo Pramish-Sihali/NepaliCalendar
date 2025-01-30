@@ -31,9 +31,9 @@ export interface MonthInfo {
   is_leap_month: boolean;
 }
 
-export interface CalendarProps {
-  onDateSelect?: (eng: Date, nep: { year: number; month: number; date: number }) => void;
-}
+// export interface CalendarProps {
+//   onDateSelect?: (eng: Date, nep: { year: number; month: number; date: number }) => void;
+// }
 
 export interface DaysInMonthMap {
   [key: number]: number[];
@@ -45,4 +45,19 @@ export interface MonthStartMap {
     month: number;
     day: number;
   }>;
+}
+
+// types.ts
+export interface CalendarProps {
+  events: CalendarEvent[];
+  onEventAdd: (event: Omit<CalendarEvent, 'id'>) => void;
+}
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  date: NepaliDate;
+  time?: string;
+  isAllDay: boolean;
+  color: string;
 }

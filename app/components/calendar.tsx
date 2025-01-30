@@ -1,93 +1,26 @@
+// components/calendar/Calendar.tsx
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { CalendarData, NepaliDate, MonthInfo, CalendarProps } from './types';
-
-interface DayCellProps {
-  day: CalendarData;
-  dayOfWeek: number;
-  isSelected: boolean;
-  isToday: boolean;
-  onClick: () => void;
-}
-
-const nepaliMonths = [
-  'बैशाख', 'जेष्ठ', 'असार', 'श्रावण', 'भदौ', 'असोज',
-  'कार्तिक', 'मंसिर', 'पुष', 'माघ', 'फागुन', 'चैत्र'
-];
-
-const englishMonths = [
-  'April/May', 'May/June', 'June/July', 'July/August', 'August/September', 
-  'September/October', 'October/November', 'November/December', 
-  'December/January', 'January/February', 'February/March', 'March/April'
-];
+import { Card, CardContent } from '@/components/ui/card';
+import { CalendarHeader } from './calendarHeader';
+import { DayCell } from './DayCell';
+import { findCurrentNepaliDate } from './utils';
+import type { CalendarProps, CalendarData, MonthInfo, NepaliDate } from './types';
+import { EventForm } from './EventForm';
 
 const weekdays = ["आईत", "सोम", "मंगल", "बुध", "बिही", "शुक्र", "शनि"];
 
-const DayCell: React.FC<DayCellProps> = ({ 
-  day, 
-  dayOfWeek,
-  isSelected, 
-  isToday,
-  onClick 
-}) => {
-  return (
-    <button
-      onClick={onClick}
-      className={`
-        aspect-square p-1 rounded-lg
-        hover:bg-gray-50 transition-colors duration-200
-        relative group
-        ${isSelected ? 'bg-blue-50 border-2 border-blue-300' : 'border border-gray-100'}
-        ${isToday ? 'ring-2 ring-blue-400 ring-offset-2' : ''}
-      `}
-    >
-      <div className="flex flex-col items-center justify-center h-full">
-        <span className={`
-          text-lg font-semibold
-          ${dayOfWeek === 0 ? 'text-gray-600' : ''}
-          ${dayOfWeek === 6 ? 'text-red-600' : 'text-gray-800'}
-          ${isSelected ? 'text-blue-700' : ''}
-        `}>
-          {day.nepali_date}
-        </span>
-        <span className="text-xs text-gray-500">
-          {day.english_date}
-        </span>
-        <div className="absolute top-0.5 right-0.5 flex gap-0.5">
-          {day.holiday && (
-            <div className="w-1.5 h-1.5 rounded-full bg-red-500" title="Holiday"/>
-          )}
-          {day.marriage_date && (
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500" title="Marriage Date"/>
-          )}
-          {day.bratabandha && (
-            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" title="Bratabandha"/>
-          )}
-        </div>
-        {(day.tithi || day.festival) && (
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max max-w-[200px] 
-                        invisible group-hover:visible bg-white p-2 rounded-lg shadow-lg 
-                        text-xs z-10 border border-gray-200">
-            {day.tithi && <div className="text-gray-600">{day.tithi}</div>}
-            {day.festival && <div className="text-red-600">{day.festival}</div>}
-          </div>
-        )}
-      </div>
-    </button>
-  );
-};
-
-const Calendar: React.FC<CalendarProps> = ({ onDateSelect }) => {
+export const Calendar: React.FC<CalendarProps> = ({ events = [], onEventAdd }) => {
   const [calendarData, setCalendarData] = useState<CalendarData[]>([]);
   const [monthInfo, setMonthInfo] = useState<MonthInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<NepaliDate | null>(null);
-  const [currentNepaliDate, setCurrentNepaliDate] = useState<NepaliDate>({
-    year: 2081,
-    month: 0,
-    day: 1
+  const [isEventFormOpen, setIsEventFormOpen] = useState(false);
+  
+  // Initialize with current date
+  const [currentNepaliDate, setCurrentNepaliDate] = useState<NepaliDate>(() => {
+    const today = new Date();
+    return findCurrentNepaliDate(today);
   });
 
   const loadMonthData = async (year: number, month: number) => {
@@ -133,6 +66,22 @@ const Calendar: React.FC<CalendarProps> = ({ onDateSelect }) => {
     }));
   };
 
+  const handleMonthChange = (month: number) => {
+    setCurrentNepaliDate(prev => ({
+      ...prev,
+      month,
+      day: 1
+    }));
+  };
+
+  const handleYearChange = (year: number) => {
+    setCurrentNepaliDate(prev => ({
+      ...prev,
+      year,
+      day: 1
+    }));
+  };
+
   const handleDateClick = (date: CalendarData) => {
     const newDate: NepaliDate = {
       year: currentNepaliDate.year,
@@ -140,19 +89,7 @@ const Calendar: React.FC<CalendarProps> = ({ onDateSelect }) => {
       day: parseInt(date.nepali_date)
     };
     setSelectedDate(newDate);
-
-    if (onDateSelect) {
-      const [month, day] = [
-        parseInt(date.english_date) <= 15 ? 3 : 4,
-        parseInt(date.english_date)
-      ];
-      const englishDate = new Date(2025, month, day);
-      onDateSelect(englishDate, {
-        year: newDate.year,
-        month: newDate.month,
-        date: newDate.day
-      });
-    }
+    setIsEventFormOpen(true);
   };
 
   if (loading) {
@@ -175,34 +112,24 @@ const Calendar: React.FC<CalendarProps> = ({ onDateSelect }) => {
     );
   }
 
+  // Get day events for a specific day
+  const getDayEvents = (nepaliDate: string) => {
+    return events.filter(event => 
+      event.date.year === currentNepaliDate.year &&
+      event.date.month === currentNepaliDate.month &&
+      event.date.day === parseInt(nepaliDate)
+    );
+  };
+
   return (
     <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
-        <button
-          onClick={handlePrevMonth}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-          aria-label="Previous month"
-        >
-          <ChevronLeft className="w-6 h-6 text-gray-600" />
-        </button>
-        
-        <div className="text-center">
-          <CardTitle className="text-2xl">
-            {nepaliMonths[currentNepaliDate.month]} {currentNepaliDate.year}
-          </CardTitle>
-          <p className="text-sm text-gray-500">
-            {englishMonths[currentNepaliDate.month]}
-          </p>
-        </div>
-
-        <button
-          onClick={handleNextMonth}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-          aria-label="Next month"
-        >
-          <ChevronRight className="w-6 h-6 text-gray-600" />
-        </button>
-      </CardHeader>
+      <CalendarHeader
+        currentNepaliDate={currentNepaliDate}
+        onMonthChange={handleMonthChange}
+        onYearChange={handleYearChange}
+        onPrevMonth={handlePrevMonth}
+        onNextMonth={handleNextMonth}
+      />
 
       <CardContent>
         <div className="calendar-grid">
@@ -225,37 +152,37 @@ const Calendar: React.FC<CalendarProps> = ({ onDateSelect }) => {
               <div key={`empty-${index}`} className="aspect-square p-1" />
             ))}
 
-            {calendarData.map((day, index) => (
-              <DayCell
-                key={`day-${index}`}
-                day={day}
-                dayOfWeek={(index + (monthInfo?.start_day_of_week || 0)) % 7}
-                isSelected={selectedDate?.day === parseInt(day.nepali_date)}
-                isToday={false}
-                onClick={() => handleDateClick(day)}
-              />
-            ))}
+            {calendarData.map((day, index) => {
+              const todayNepaliDate = findCurrentNepaliDate(new Date());
+              const isCurrentDay = 
+                currentNepaliDate.year === todayNepaliDate.year &&
+                currentNepaliDate.month === todayNepaliDate.month &&
+                parseInt(day.nepali_date) === todayNepaliDate.day;
+
+              return (
+                <DayCell
+                  key={`day-${index}`}
+                  day={day}
+                  dayOfWeek={(index + (monthInfo?.start_day_of_week || 0)) % 7}
+                  isSelected={selectedDate?.day === parseInt(day.nepali_date)}
+                  isToday={isCurrentDay}
+                  events={getDayEvents(day.nepali_date)}
+                  onClick={() => handleDateClick(day)}
+                />
+              );
+            })}
           </div>
         </div>
-
-        {/* <div className="mt-4 pt-4 border-t border-gray-200">
-          <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-            <div className="flex items-center">
-              <div className="w-2 h-2 rounded-full bg-red-500 mr-2" />
-              <span>Holiday</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-              <span>Marriage Date</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-2 h-2 rounded-full bg-indigo-500 mr-2" />
-              <span>Bratabandha</span>
-            </div>
-          </div>
-        </div> */}
-
       </CardContent>
+
+      {selectedDate && (
+        <EventForm
+          isOpen={isEventFormOpen}
+          onClose={() => setIsEventFormOpen(false)}
+          selectedDate={selectedDate}
+          onSubmit={onEventAdd}
+        />
+      )}
     </Card>
   );
 };

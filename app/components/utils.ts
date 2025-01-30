@@ -97,3 +97,12 @@ export const formatNepaliDate = (date: NepaliDate): string => {
   
   return `${date.day} ${nepaliMonths[date.month]} ${date.year}`;
 };
+
+
+export const isToday = (nepaliDate: NepaliDate, today: NepaliDate): boolean => {
+  return (
+    nepaliDate.year === today.year &&
+    nepaliDate.month === today.month &&
+    nepaliDate.day === today.day
+  );
+};

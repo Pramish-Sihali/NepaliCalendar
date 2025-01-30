@@ -1,101 +1,157 @@
 // app/api/calendar-data/[years]/[months]/route.ts
 import { NextResponse } from 'next/server';
+import calendarData from '@/data/nepali_calendar_data.json';
 
-// Updated days per month for 2081 (correct values)
-const daysInMonth2081 = {
-  baisakh: 31,
-  jestha: 32,
-  ashad: 31,
-  shrawan: 32,
-  bhadra: 31,
-  ashwin: 31,
-  kartik: 30,
-  mangsir: 30,
-  poush: 30,
-  magh: 30,
-  falgun: 30,
-  chaitra: 30
-};
+interface CalendarError {
+  error: string;
+  status: number;
+}
 
-// Updated start days for 2081 (Sunday = 0)
-const startDays2081 = {
-  baisakh: 6,    // Sunday
-  jestha: 2,     // Wednesday
-  ashad: 6,      // Saturday
-  shrawan: 2,    // Tuesday
-  bhadra: 6,     // Friday
-  ashwin: 2,     // Monday
-  kartik: 4,     // Wednesday
-  mangsir: 6,    // Friday
-  poush: 1,      // Sunday
-  magh: 2,       // Wednesday
-  falgun: 4,     // Friday
-  chaitra: 5     // Sunday
-};
+interface MonthData {
+  index: number;
+  total_days: number;
+  start_day_of_week: number;
+  is_leap_month: boolean;
+  data: Array<{
+    nepali_date: string;
+    english_date: string;
+    tithi: string;
+    festival: string;
+    holiday: boolean;
+    marriage_date: boolean;
+    bratabandha: boolean;
+  }>;
+  first_day_english?: {
+    english_date: number;
+    english_month: string;
+  };
+  error?: string;
+}
 
+interface YearData {
+  months: MonthData[];
+  year_info: {
+    total_days: number;
+    has_leap_month: boolean;
+  };
+}
 
+function validateParams(year: string, month: number): CalendarError | null {
+  const yearNum = parseInt(year);
+  
+  // Validate year
+  if (isNaN(yearNum) || yearNum < 2081 || yearNum > 2085) {
+    return {
+      error: 'Year must be between 2081 and 2085',
+      status: 400
+    };
+  }
 
-const monthNames = [
-  'baisakh', 'jestha', 'ashad', 'shrawan', 'bhadra', 'ashwin',
-  'kartik', 'mangsir', 'poush', 'magh', 'falgun', 'chaitra'
-];
+  // Validate month
+  if (isNaN(month) || month < 0 || month > 11) {
+    return {
+      error: 'Month must be between 0 and 11',
+      status: 400
+    };
+  }
+
+  return null;
+}
 
 export async function GET(
   request: Request,
   { params }: { params: { years: string; months: string } }
 ) {
   try {
-    const { years, months } = params;
+    const { years: year, months } = params;
     const monthIndex = parseInt(months);
-    const monthName = monthNames[monthIndex];
-    
-    // Get the correct number of days and start day for this month
-    const totalDays = daysInMonth2081[monthName as keyof typeof daysInMonth2081];
-    const startDay = startDays2081[monthName as keyof typeof startDays2081];
-    
-    // Generate calendar data with correct English date mapping
-    const data = Array.from({ length: totalDays }, (_, i) => {
-      const nepaliDay = i + 1;
-      let englishDate;
-      
-      // Updated English date calculation based on month
-      if (monthIndex === 1) { // Jestha
-        englishDate = nepaliDay <= 18 ? nepaliDay + 13 : nepaliDay - 18;
-      } else {
-        englishDate = nepaliDay <= 15 ? nepaliDay + 13 : nepaliDay - 17;
+
+    // Validate parameters
+    const validationError = validateParams(year, monthIndex);
+    if (validationError) {
+      return NextResponse.json(
+        { error: validationError.error },
+        { status: validationError.status }
+      );
+    }
+
+    // Get year data
+    const yearData = (calendarData as Record<string, YearData>)[year];
+    if (!yearData) {
+      return NextResponse.json(
+        { error: `Data not found for year ${year}` },
+        { status: 404 }
+      );
+    }
+
+    // Get month data
+    const monthData = yearData.months[monthIndex];
+    if (!monthData) {
+      return NextResponse.json(
+        { error: `Data not found for month ${monthIndex}` },
+        { status: 404 }
+      );
+    }
+
+    // Check if month has error
+    if (monthData.error) {
+      return NextResponse.json(
+        { error: `Error in month data: ${monthData.error}` },
+        { status: 500 }
+      );
+    }
+
+    // Format response
+    const response = {
+      data: monthData.data,
+      info: {
+        year: parseInt(year),
+        month: monthIndex,
+        total_days: monthData.total_days,
+        start_day_of_week: monthData.start_day_of_week,
+        is_leap_month: monthData.is_leap_month,
+        first_day_english: monthData.first_day_english,
+        year_info: yearData.year_info
+      },
+      meta: {
+        has_errors: false,
+        data_available: monthData.data.length > 0
       }
-
-      return {
-        nepali_date: String(nepaliDay),
-        english_date: String(englishDate),
-        tithi: "",
-        festival: "",
-        holiday: false,
-        marriage_date: false,
-        bratabandha: false,
-        day_of_week: (startDay + i) % 7
-      };
-    });
-
-    const monthInfo = {
-      year: parseInt(years),
-      month: monthIndex,
-      month_name: monthName,
-      total_days: totalDays,
-      start_day_of_week: startDay,
-      is_leap_month: totalDays > 31
     };
 
-    return NextResponse.json({
-      data,
-      info: monthInfo
-    });
+    return NextResponse.json(response);
 
   } catch (error) {
     console.error('API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to load calendar data' },
+      { 
+        error: 'Failed to load calendar data',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }
+}
+
+// Optional: Add additional endpoints for more functionality
+export async function HEAD(
+  request: Request,
+  { params }: { params: { years: string; months: string } }
+) {
+  const { years: year, months } = params;
+  const monthIndex = parseInt(months);
+
+  const validationError = validateParams(year, monthIndex);
+  if (validationError) {
+    return new Response(null, { status: validationError.status });
+  }
+
+  const yearData = (calendarData as Record<string, YearData>)[year];
+  const monthData = yearData?.months[monthIndex];
+
+  if (!yearData || !monthData) {
+    return new Response(null, { status: 404 });
+  }
+
+  return new Response(null, { status: 200 });
 }

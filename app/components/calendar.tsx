@@ -9,7 +9,12 @@ import { EventForm } from './EventForm';
 
 const weekdays = ["आईत", "सोम", "मंगल", "बुध", "बिही", "शुक्र", "शनि"];
 
-export const Calendar: React.FC<CalendarProps> = ({ events = [], onEventAdd }) => {
+export const Calendar: React.FC<CalendarProps> = ({ 
+  events = [], 
+  onEventAdd, 
+  selectedDate: externalSelectedDate,
+  onDateSelect 
+}) => {
   const [calendarData, setCalendarData] = useState<CalendarData[]>([]);
   const [monthInfo, setMonthInfo] = useState<MonthInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -97,6 +102,7 @@ export const Calendar: React.FC<CalendarProps> = ({ events = [], onEventAdd }) =
       day: parseInt(date.nepali_date)
     };
     setSelectedDate(newDate);
+    onDateSelect?.(newDate);
     setIsEventFormOpen(true);
   };
 
@@ -176,12 +182,18 @@ export const Calendar: React.FC<CalendarProps> = ({ events = [], onEventAdd }) =
                 currentNepaliDate.month === todayNepaliDate.month &&
                 parseInt(day.nepali_date) === todayNepaliDate.day;
 
+              const isSelected = (externalSelectedDate && 
+                currentNepaliDate.year === externalSelectedDate.year &&
+                currentNepaliDate.month === externalSelectedDate.month &&
+                parseInt(day.nepali_date) === externalSelectedDate.day) ||
+                (selectedDate?.day === parseInt(day.nepali_date));
+
               return (
                 <DayCell
                   key={`day-${index}`}
                   day={day}
                   dayOfWeek={(index + (monthInfo?.start_day_of_week || 0)) % 7}
-                  isSelected={selectedDate?.day === parseInt(day.nepali_date)}
+                  isSelected={isSelected}
                   isToday={isCurrentDay}
                   events={getDayEvents(day.nepali_date)}
                   onClick={() => handleDateClick(day)}

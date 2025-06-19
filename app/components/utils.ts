@@ -1,5 +1,5 @@
 // utils.ts
-import { NepaliDate, EnglishDate } from './types';
+import { NepaliDate } from './types';
 import { monthStartMapping, daysInMonthNepali } from './constants';
 
 export const findCurrentNepaliDate = (englishDate: Date): NepaliDate => {

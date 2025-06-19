@@ -1,6 +1,6 @@
 // components/calendar/ClockTimePicker.tsx
-import React, { useState, useEffect } from 'react';
-import { Clock } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { Button } from "@/components/ui/button";
 
 interface ClockTimePickerProps {
@@ -11,9 +11,9 @@ interface ClockTimePickerProps {
 }
 
 export const ClockTimePicker: React.FC<ClockTimePickerProps> = ({
- value,
+
  onChange,
- label,
+
  minTime
 }) => {
  const [isHourView, setIsHourView] = useState(true);

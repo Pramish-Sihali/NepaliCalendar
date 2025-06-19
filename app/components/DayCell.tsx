@@ -89,8 +89,12 @@ export const DayCell: React.FC<DayCellProps> = ({
                     <div key={event.id} className="flex items-center gap-1 py-0.5">
                       <div className={`w-2 h-2 rounded-full ${event.color}`} />
                       <span>{event.title}</span>
-                      {!event.isAllDay && event.time && (
-                        <span className="text-gray-500">({event.time})</span>
+                      {!event.isAllDay && event.startTime && (
+                        <span className="text-gray-500">({new Date(`2000-01-01T${event.startTime}`).toLocaleTimeString([], {
+                          hour: 'numeric',
+                          minute: '2-digit',
+                          hour12: true
+                        })})</span>
                       )}
                     </div>
                   ))}

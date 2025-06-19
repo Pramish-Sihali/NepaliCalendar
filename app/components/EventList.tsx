@@ -2,8 +2,8 @@
 import React from 'react';
 import { CalendarEvent } from './types';
 import { convertToEnglishDate, formatNepaliDate } from './utils';
-import { Card } from '@/components/ui/card';
-import { CalendarIcon, Clock, MoreVertical, Pencil, Trash2, User, Building, MapPin } from 'lucide-react';
+
+import { CalendarIcon, Clock, MoreVertical, Pencil, Trash2, User, Building,  } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,

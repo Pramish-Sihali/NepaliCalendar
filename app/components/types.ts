@@ -1,4 +1,4 @@
-// types.ts
+// app/components/types.ts
 export interface NepaliDate {
   year: number;
   month: number;
@@ -46,19 +46,41 @@ export interface MonthStartMap {
 
 export interface CalendarProps {
   events: CalendarEvent[];
-  onEventAdd: (event: Omit<CalendarEvent, 'id'>) => void;
+  onEventAdd: (event: Omit<CalendarEvent, 'id' | 'created_at' | 'updated_at'>) => void;
+  selectedDate?: NepaliDate | null;
+  onDateSelect?: (date: NepaliDate) => void;
 }
 
+// Updated CalendarEvent interface to match database schema
 export interface CalendarEvent {
   id: string;
   title: string;
   description: string;
   name: string;           // Person/Contact name
   organization: string;   // Organization/Company
-  date: NepaliDate;
-  time?: string;
-  startTime?: string;
-  endTime?: string;
-  isAllDay: boolean;
+  date: NepaliDate;       // This will be converted to/from nepali_year, nepali_month, nepali_day
+  startTime?: string;     // Maps to start_time in DB
+  endTime?: string;       // Maps to end_time in DB
+  isAllDay: boolean;      // Maps to is_all_day in DB
   color: string;
+  created_at?: string;    // Added database field
+  updated_at?: string;    // Added database field
+}
+
+// Database row interface (what we get from Supabase)
+export interface DatabaseEvent {
+  id: string;
+  title: string;
+  description: string;
+  name: string;
+  organization: string;
+  nepali_year: number;
+  nepali_month: number;
+  nepali_day: number;
+  start_time: string | null;
+  end_time: string | null;
+  is_all_day: boolean;
+  color: string;
+  created_at: string;
+  updated_at: string;
 }

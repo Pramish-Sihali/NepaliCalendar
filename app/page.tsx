@@ -4,28 +4,34 @@
 import { useState, useEffect } from 'react';
 import Calendar from './components/calendar';
 import { EventsSection } from './components/EventsSection';
-import { CalendarEvent } from './components/types';
-
-const EVENTS_STORAGE_KEY = 'nepali-calendar-events';
+import { TimelineView } from './components/TimelineView';
+import { CalendarEvent, NepaliDate } from './components/types';
+import { EventsService } from '@/services/events';
+import { findCurrentNepaliDate } from './components/utils';
 
 export default function Home() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [selectedDate, setSelectedDate] = useState<NepaliDate | null>(() => {
+    // Initialize with current Nepali date
+    return findCurrentNepaliDate(new Date());
+  });
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Load events from localStorage on component mount
+  // Load events from Supabase on component mount
   useEffect(() => {
-    const loadEvents = () => {
+    const loadEvents = async () => {
       try {
-        if (typeof window !== 'undefined') {
-          const savedEvents = localStorage.getItem(EVENTS_STORAGE_KEY);
-          if (savedEvents) {
-            const parsedEvents = JSON.parse(savedEvents);
-            setEvents(parsedEvents);
-          }
-        }
+        setIsLoading(true);
+        setError(null);
+        const fetchedEvents = await EventsService.getAllEvents();
+        setEvents(fetchedEvents);
       } catch (error) {
-        console.error('Error loading events from localStorage:', error);
+        console.error('Error loading events:', error);
+        setError('Failed to load events. Please try again.');
       } finally {
+        setIsLoading(false);
         setIsLoaded(true);
       }
     };
@@ -33,94 +39,45 @@ export default function Home() {
     loadEvents();
   }, []);
 
-  // Save events to localStorage whenever events change
-  useEffect(() => {
-    if (isLoaded) {
-      try {
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(events));
-        }
-      } catch (error) {
-        console.error('Error saving events to localStorage:', error);
-      }
-    }
-  }, [events, isLoaded]);
-
-  const handleAddEvent = (event: Omit<CalendarEvent, 'id'>) => {
-    const newEvent: CalendarEvent = {
-      ...event,
-      id: crypto.randomUUID(),
-      // Ensure name and organization have default values if not provided
-      name: event.name || '',
-      organization: event.organization || '',
-    };
-    setEvents((prev) => [...prev, newEvent]);
-  };
-
-  const handleEditEvent = (updatedEvent: CalendarEvent) => {
-    setEvents((prev) => 
-      prev.map((event) => 
-        event.id === updatedEvent.id ? updatedEvent : event
-      )
-    );
-  };
-
-  const handleDeleteEvent = (eventId: string) => {
-    setEvents((prev) => prev.filter((event) => event.id !== eventId));
-  };
-
-  // Clear all events (optional utility function)
-  const handleClearAllEvents = () => {
-    if (confirm('Are you sure you want to delete all events? This action cannot be undone.')) {
-      setEvents([]);
-    }
-  };
-
-  // Export events as JSON (optional utility function)
-  const handleExportEvents = () => {
+  const handleAddEvent = async (event: Omit<CalendarEvent, 'id' | 'created_at' | 'updated_at'>) => {
     try {
-      const dataStr = JSON.stringify(events, null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      
-      const exportFileDefaultName = `nepali-calendar-events-${new Date().toISOString().split('T')[0]}.json`;
-      
-      const linkElement = document.createElement('a');
-      linkElement.setAttribute('href', dataUri);
-      linkElement.setAttribute('download', exportFileDefaultName);
-      linkElement.click();
+      setError(null);
+      const newEvent = await EventsService.createEvent(event);
+      setEvents((prev) => [newEvent, ...prev]);
     } catch (error) {
-      console.error('Error exporting events:', error);
-      alert('Failed to export events');
+      console.error('Error adding event:', error);
+      setError('Failed to add event. Please try again.');
     }
   };
 
-  // Import events from JSON file (optional utility function)
-  const handleImportEvents = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const content = e.target?.result as string;
-        const importedEvents = JSON.parse(content);
-        
-        if (Array.isArray(importedEvents)) {
-          setEvents(importedEvents);
-          alert('Events imported successfully!');
-        } else {
-          alert('Invalid file format');
-        }
-      } catch (error) {
-        console.error('Error importing events:', error);
-        alert('Failed to import events');
-      }
-    };
-    reader.readAsText(file);
-    
-    // Reset input
-    event.target.value = '';
+  const handleEditEvent = async (updatedEvent: CalendarEvent) => {
+    try {
+      setError(null);
+      const updated = await EventsService.updateEvent(updatedEvent.id, updatedEvent);
+      setEvents((prev) => 
+        prev.map((event) => 
+          event.id === updated.id ? updated : event
+        )
+      );
+    } catch (error) {
+      console.error('Error updating event:', error);
+      setError('Failed to update event. Please try again.');
+    }
   };
+
+  const handleDeleteEvent = async (eventId: string) => {
+    try {
+      setError(null);
+      await EventsService.deleteEvent(eventId);
+      setEvents((prev) => prev.filter((event) => event.id !== eventId));
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      setError('Failed to delete event. Please try again.');
+    }
+  };
+
+
+
 
   // Show loading state while data is being loaded
   if (!isLoaded) {
@@ -128,7 +85,9 @@ export default function Home() {
       <main className="min-h-screen p-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center h-64">
-            <div className="text-lg text-gray-600">Loading calendar...</div>
+            <div className="text-lg text-gray-600">
+              {isLoading ? 'Loading calendar...' : 'Initializing...'}
+            </div>
           </div>
         </div>
       </main>
@@ -140,56 +99,42 @@ export default function Home() {
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900">
-            BOARDROOM - पात्रो
+            Boardroom Meeting and Events planner
           </h1>
           <p className="text-sm text-gray-600 mt-2">
-            {events.length} event{events.length !== 1 ? 's' : ''} saved locally
+            {events.length} event{events.length !== 1 ? 's' : ''} in shared calendar
           </p>
+          {error && (
+            <div className="mt-2 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
         </div>
         
-        {/* Optional: Add utility buttons */}
-        {/* <div className="flex justify-center gap-4 text-sm">
-          <input
-            type="file"
-            accept=".json"
-            onChange={handleImportEvents}
-            className="hidden"
-            id="import-events"
-          />
-          <label
-            htmlFor="import-events"
-            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer"
-          >
-            Import Events
-          </label>
-          <button
-            onClick={handleExportEvents}
-            className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-            disabled={events.length === 0}
-          >
-            Export Events
-          </button>
-          <button
-            onClick={handleClearAllEvents}
-            className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-            disabled={events.length === 0}
-          >
-            Clear All
-          </button>
-        </div> */}
+       
         
         <div className="grid grid-cols-12 gap-8">
-          <div className="col-span-12 lg:col-span-8">
-            <div className="sticky top-8">
-              <Calendar events={events} onEventAdd={handleAddEvent} />
-            </div>
+          {/* Left side - Calendar and Events List */}
+          <div className="col-span-12 lg:col-span-8 space-y-8">
+            <Calendar 
+              events={events} 
+              onEventAdd={handleAddEvent}
+              selectedDate={selectedDate}
+              onDateSelect={setSelectedDate}
+            />
+            <EventsSection 
+              events={events}
+              onEventEdit={handleEditEvent}
+              onEventDelete={handleDeleteEvent}
+            />
           </div>
+          
+          {/* Right side - Timeline */}
           <div className="col-span-12 lg:col-span-4">
             <div className="sticky top-8">
-              <EventsSection 
+              <TimelineView 
+                selectedDate={selectedDate}
                 events={events}
-                onEventEdit={handleEditEvent}
-                onEventDelete={handleDeleteEvent}
               />
             </div>
           </div>

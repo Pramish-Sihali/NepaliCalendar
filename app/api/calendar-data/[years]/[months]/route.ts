@@ -60,10 +60,11 @@ function validateParams(year: string, month: number): CalendarError | null {
 
 export async function GET(
   request: Request,
-  { params }: { params: { years: string; months: string } }
+  { params }: { params: Promise<{ years: string; months: string }> }
 ) {
   try {
-    const { years: year, months } = params;
+    // Await params before destructuring
+    const { years: year, months } = await params;
     const monthIndex = parseInt(months);
 
     // Validate parameters
@@ -136,9 +137,9 @@ export async function GET(
 // Optional: Add additional endpoints for more functionality
 export async function HEAD(
   request: Request,
-  { params }: { params: { years: string; months: string } }
+  { params }: { params: Promise<{ years: string; months: string }> }
 ) {
-  const { years: year, months } = params;
+  const { years: year, months } = await params;
   const monthIndex = parseInt(months);
 
   const validationError = validateParams(year, monthIndex);

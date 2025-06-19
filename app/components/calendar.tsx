@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { CalendarHeader } from './CalendarHeader';
 import { DayCell } from './DayCell';
-import { findCurrentNepaliDate } from './utils';
+import { findCurrentNepaliDate, debugDateConversion } from './utils';
 import type { CalendarProps, CalendarData, MonthInfo, NepaliDate } from './types';
 import { EventForm } from './EventForm';
 
@@ -20,7 +20,15 @@ export const Calendar: React.FC<CalendarProps> = ({ events = [], onEventAdd }) =
   // Initialize with current date
   const [currentNepaliDate, setCurrentNepaliDate] = useState<NepaliDate>(() => {
     const today = new Date();
-    return findCurrentNepaliDate(today);
+    const nepaliToday = findCurrentNepaliDate(today);
+    
+    // Add debug logging
+    console.log('=== CALENDAR INITIALIZATION ===');
+    console.log('Today (English):', today.toDateString());
+    console.log('Converted to Nepali:', nepaliToday);
+    debugDateConversion();
+    
+    return nepaliToday;
   });
 
   const loadMonthData = async (year: number, month: number) => {
@@ -121,6 +129,9 @@ export const Calendar: React.FC<CalendarProps> = ({ events = [], onEventAdd }) =
     );
   };
 
+  // Get today's Nepali date for highlighting
+  const todayNepaliDate = findCurrentNepaliDate(new Date());
+  
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CalendarHeader
@@ -132,6 +143,13 @@ export const Calendar: React.FC<CalendarProps> = ({ events = [], onEventAdd }) =
       />
 
       <CardContent>
+        {/* Debug info */}
+        {/* <div className="mb-4 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
+          <strong>Debug:</strong> Today's Nepali Date: {todayNepaliDate.year}/{todayNepaliDate.month + 1}/{todayNepaliDate.day} | 
+          Viewing: {currentNepaliDate.year}/{currentNepaliDate.month + 1} | 
+          English Today: {new Date().toDateString()}
+        </div> */}
+
         <div className="calendar-grid">
           <div className="grid grid-cols-7 mb-2">
             {weekdays.map((day, index) => (
@@ -153,7 +171,6 @@ export const Calendar: React.FC<CalendarProps> = ({ events = [], onEventAdd }) =
             ))}
 
             {calendarData.map((day, index) => {
-              const todayNepaliDate = findCurrentNepaliDate(new Date());
               const isCurrentDay = 
                 currentNepaliDate.year === todayNepaliDate.year &&
                 currentNepaliDate.month === todayNepaliDate.month &&

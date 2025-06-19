@@ -1,6 +1,6 @@
 // app/api/calendar-data/[years]/[months]/route.ts
 import { NextResponse } from 'next/server';
-import calendarData from '@/data/nepali_calendar_data.json';
+import calendarData from '@/calendardata/nepali_calendar_data.json';
 
 interface CalendarError {
   error: string;
